@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  analytics-db:
+    image: postgres:16
+    container_name: analytics-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: bfh_analytics
+      POSTGRES_USER: analytics
+      POSTGRES_PASSWORD: analytics_pass
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  analytics-api:
+    build: ./app
+    container_name: analytics-api
+    restart: unless-stopped
+    depends_on:
+      - analytics-db
+    environment:
+      DB_HOST: analytics-db
+      DB_PORT: 5432
+      DB_NAME: bfh_analytics
+      DB_USER: analytics
+      DB_PASSWORD: analytics_pass
+    ports:
+      - "8000:8000"
